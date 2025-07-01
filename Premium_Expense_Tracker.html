@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseFlow: Your Smart Financial Companion</title>
+    <!-- Google Fonts: Inter for a clean, modern, and professional look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js library for creating charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- PWA: Link to manifest.json -->
+    <link rel="manifest" href="./manifest.json">
+
+    <style>
+        /* --- CSS Starts Here (Refined for a truly professional look) --- */
+
+        /* Root variables for easy theme management and consistency */
+        :root {
+            --primary-blue: #5a80e7; /* A vibrant, yet calming blue for main actions and highlights */
+            --primary-blue-dark: #476ac7; /* Darker shade for hover states */
+            --soft-green: #2ecc71; /* Gentle green for income/positive elements */
+            --soft-red: #e74c3c; /* Muted red for expenses/negative elements */
+            --accent-orange: #FF9800; /* Warm orange for custom category tags */
+            --info-color: #2196F3; /* Standard blue for informational elements */
+
+            --text-color-dark: #2c3e50; /* Deep charcoal for primary text, excellent readability */
+            --text-color-medium: #7f8c8d; /* Medium grey for secondary text and subtle hints */
+            --text-color-light: #bdc3c7; /* Very light grey for subtle details/placeholders */
+
+            --bg-page: #f8f9fa; /* Very light, almost off-white background for the entire page, soothing */
+            --bg-light-alt: #f0f2f5; /* A slightly darker light background for subtle contrast in sections */
+            --bg-card: #ffffff; /* Crisp white for main content cards, creating a clean canvas */
+            
+            --border-light: #e9ecef; /* Soft, almost invisible border for inputs and subtle lines */
+            --border-medium: #dee2e6; /* A slightly darker border for section separators, providing structure */
+            
+            --shadow-subtle: 0 6px 20px rgba(0, 0, 0, 0.07); /* A gentle, broad shadow */
+            --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.12); /* More pronounced shadow on hover */
+            --shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.03); /* Very subtle inner shadow for framed elements like the chart */
+
+            --radius-large: 16px; /* Larger border-radius for softer, modern, and friendly look */
+            --radius-small: 8px; /* Standard rounded corners for inputs and smaller buttons */
+
+            --font-main: 'Inter', sans-serif; /* Inter for all text - highly readable, professional sans-serif */
+        }
+
+        /* Basic reset and font application */
+        * {
+            box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main); /* Apply Inter font globally */
+            background-color: var(--bg-page); /* Page background color */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            justify-content: center; /* Center content vertically */
+            min-height: 100vh; /* Full viewport height */
+            color: var(--text-color-dark); /* Default text color */
+            line-height: 1.6; /* Improved readability for body text */
+            padding: 20px; /* Padding around the main container for small screens */
+            overflow-x: hidden; /* Prevent horizontal scroll on smaller screens */
+        }
+
+        /* Main container for the application */
+        .container {
+            background-color: var(--bg-card); /* White card background */
+            padding: 45px; /* Generous internal padding */
+            border-radius: var(--radius-large); /* Softly rounded corners */
+            box-shadow: var(--shadow-subtle); /* Subtle shadow for a floating effect */
+            width: 480px; /* Optimal width for readability and balance */
+            max-width: 98%; /* Ensures responsiveness */
+            text-align: center;
+            position: relative;
+            overflow: hidden; /* Ensures shadows/borders are contained */
+            transition: box-shadow 0.3s ease-in-out; /* Smooth shadow transition on interaction */
+        }
+
+        /* Headings styling for consistent typography */
+        h1, h2, h3, h4 { /* All headings use the main font */
+            font-family: var(--font-main);
+        }
+
+        h1 {
+            font-weight: 700; /* Boldest for main title */
+            color: var(--primary-blue);
+            margin-bottom: 28px;
+            font-size: 2.8em;
+            letter-spacing: -0.8px; /* Slight negative letter spacing for a tighter look */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1); /* Subtle text shadow for depth */
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--text-color-dark);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            border-bottom: 2px solid var(--border-medium); /* Thicker, more defined separator */
+            padding-bottom: 12px;
+            margin: 40px 0 20px; /* Generous top margin to separate sections */
+            text-align: left;
+            color: var(--text-color-dark);
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        /* Balance display section (Hero Section) */
+        .balance-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #7a9ee9 100%); /* Sophisticated blue gradient */
+            color: #fff;
+            padding: 25px 0;
+            border-radius: var(--radius-large);
+            margin-bottom: 35px;
+            box-shadow: var(--shadow-subtle);
+            animation: fadeIn 0.8s ease-out forwards; /* Fade-in animation on load */
+        }
+
+        #balance-amount {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-top: 8px;
+            text-shadow: 2px 3px 5px rgba(0,0,0,0.4);
+        }
+
+        /* Income/Expense summary boxes */
+        .income-expense-summary {
+            background-color: var(--bg-card);
+            box-shadow: var(--shadow-subtle);
+            padding: 28px;
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            border-radius: var(--radius-large);
+            border: 1px solid var(--border-color);
+        }
+
+        .income-expense-summary > div {
+            flex: 1;
+            text-align: center;
+            padding: 0 18px;
+        }
+
+        .income-expense-summary > div:first-of-type {
+            border-right: 1px solid var(--border-color); /* Separator line */
+        }
+
+        .income-expense-summary h4 {
+            font-family: var(--font-main);
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color-medium);
+            font-size: 1.15em;
+        }
+
+        .money {
+            font-family: var(--font-main); /* Amounts use Inter for clarity */
+            font-size: 2em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            /* FIX FOR LONG NUMBERS: Allows numbers to break and wrap within the box */
+            word-break: break-all;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .money.plus {
+            color: var(--soft-green); /* Green for positive amounts */
+        }
+
+        .money.minus {
+            color: var(--soft-red); /* Red for negative amounts */
+        }
+
+        /* Form styling */
+        .form-control {
+            margin-bottom: 22px;
+            text-align: left;
+        }
+
+        label {
+            font-family: var(--font-main);
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color-medium);
+            font-size: 0.98em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            font-family: var(--font-main); /* Inter for input text */
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-small);
+            display: block;
+            font-size: 1.05em;
+            padding: 15px;
+            width: 100%;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            background-color: var(--bg-light-alt); /* Input background matches page for seamless feel */
+            color: var(--text-color-dark);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(90, 128, 231, 0.25); /* Focus shadow using primary blue */
+            background-color: var(--bg-card); /* White background on focus */
+        }
+
+        /* Call-to-Action Buttons */
+        .btn {
+            font-family: var(--font-main);
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%); /* Horizontal gradient for depth */
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-small);
+            display: block;
+            font-size: 1.2em; /* Larger and more inviting */
+            padding: 16px 28px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.3s ease; /* Smooth transition for all properties */
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-top: 25px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%); /* Reverse gradient on hover */
+            transform: translateY(-4px); /* Stronger lift effect */
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-subtle);
+            background: var(--primary-blue);
+        }
+
+        /* Transaction List */
+        .list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 45px;
+        }
+
+        .list li {
+            background-color: var(--bg-card);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            color: var(--text-color-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            margin-bottom: 15px;
+            border-radius: var(--radius-small);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .list li:hover {
+            transform: translateX(10px); /* Smooth slide effect */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .list li.plus {
+            border-left: 6px solid var(--soft-green); /* Consistent accent border */
+        }
+
+        .list li.minus {
+            border-left: 6px solid var(--soft-red);
+        }
+
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-grow: 1;
+        }
+
+        .transaction-description {
+            font-weight: 600;
+            font-size: 1.15em;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 0.88em;
+            color: var(--text-color-medium);
+        }
+
+        .category-tag {
+            font-family: var(--font-main); /* Tag font */
+            background-color: var(--info-color); /* General info blue for tags */
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 25px; /* Pill shape */
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 18px;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Delete button within list item */
+        .delete-btn {
+            cursor: pointer;
+            background-color: var(--soft-red); /* Use soft-red for delete button */
+            border: none;
+            color: #fff;
+            font-size: 1.2em;
+            padding: 10px 14px;
+            border-radius: var(--radius-small);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-left: 20px;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        /* Category Management Section */
+        .category-management {
+            margin-top: 35px;
+            text-align: left;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-medium);
+        }
+
+        .category-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .category-input-group input {
+            flex-grow: 1;
+            margin-bottom: 0;
+            padding: 12px;
+        }
+
+        .category-input-group .btn {
+            width: auto;
+            padding: 12px 20px;
+            font-size: 0.95em;
+            margin: 0;
+            box-shadow: none;
+            background: var(--info-color); /* Blue for category buttons */
+        }
+        .category-input-group .btn:hover {
+            background-color: #1976D2;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-small);
+            min-height: 60px;
+            align-items: center;
+            background-color: var(--bg-light-alt);
+        }
+
+        .current-categories .category-tag {
+            background-color: var(--accent-orange); /* Orange for custom category tags in management */
+            color: var(--text-color-dark);
+            padding: 7px 15px;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+
+        .remove-category-btn {
+            background: none;
+            border: none;
+            color: var(--text-color-dark);
+            font-size: 1em;
+            cursor: pointer;
+            padding: 0 5px;
+            transition: color 0.2s ease;
+        }
+
+        .remove-category-btn:hover {
+            color: var(--soft-red); /* Red on hover for removal */
+        }
+
+        /* Filter Section */
+        .filter-section {
+            margin-top: 30px;
+            text-align: left;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-medium);
+        }
+        .filter-section .form-control {
+            margin-bottom: 0;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-medium);
+            text-align: left;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px; /* Fixed height for consistency */
+            margin: 25px auto 0;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-large);
+            box-shadow: var(--shadow-inset);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Spending Insights Section */
+        .insights-section {
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-medium);
+            text-align: left;
+        }
+
+        .insights-output {
+            background-color: var(--bg-light-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-small);
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: var(--text-color-medium);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .insights-output.loading {
+            font-style: normal;
+            color: var(--primary-blue-dark);
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar (Subtle professional touch) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-page);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-color-light);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-color-medium);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 20px;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            #balance-amount {
+                font-size: 2.8em;
+            }
+            .money {
+                font-size: 1.5em;
+            }
+            .income-expense-summary {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            .income-expense-summary > div:first-of-type {
+                border-right: none;
+                padding-bottom: 15px;
+                border-bottom: 1px solid var(--border-light);
+            }
+            .list li {
+                padding: 12px 15px;
+            }
+            .category-input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .category-input-group input {
+                flex-grow: 1;
+            }
+            .category-input-group .btn {
+                width: 100%;
+            }
+            .chart-container {
+                height: 280px;
+            }
+        }
+        /* --- CSS Ends Here --- */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ExpenseFlow</h1> <!-- A more professional app name -->
+
+        <div class="balance-section">
+            <h2>Your Current Balance:</h2>
+            <p id="balance-amount">₹0.00</p>
+        </div>
+
+        <div class="income-expense-summary">
+            <div>
+                <h4>Income</h4>
+                <p id="income-amount" class="money plus">₹0.00</p>
+            </div>
+            <div>
+                <h4>Expense</h4>
+                <p id="expense-amount" class="money minus">₹0.00</p>
+            </div>
+        </div>
+
+        <h3>Add New Transaction</h3>
+        <form id="transaction-form">
+            <div class="form-control">
+                <label for="text">Description</label>
+                <input type="text" id="text" placeholder="e.g., Coffee, Salary" required />
+            </div>
+            <div class="form-control">
+                <label for="amount">Amount <br /> (negative for expense, positive for income)</label>
+                <input type="number" id="amount" placeholder="e.g., -500 for expense, 1000 for income" required />
+            </div>
+            <div class="form-control">
+                <label for="category">Category</label>
+                <select id="category" required>
+                    <!-- Categories will be dynamically loaded here by JS -->
+                </select>
+            </div>
+            <button class="btn">Add Transaction</button>
+        </form>
+
+        <div class="category-management">
+            <h3>Manage Categories</h3>
+            <div class="form-control category-input-group">
+                <input type="text" id="new-category-name" placeholder="Enter new category name" />
+                <button class="btn" id="add-category-btn">Add Category</button>
+            </div>
+            <div class="current-categories" id="current-categories-display">
+                <!-- Current categories will be displayed here by JS -->
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h3>Filter Transactions</h3>
+            <div class="form-control">
+                <label for="filter-category">Filter by Category</label>
+                <select id="filter-category">
+                    <option value="All">Show All</option>
+                    <!-- Categories will be dynamically loaded here by JS -->
+                </select>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <h3>Spending Breakdown</h3>
+            <div class="chart-container">
+                <canvas id="expensePieChart"></canvas>
+            </div>
+        </div>
+
+        <h3>Transaction History</h3>
+        <ul id="list" class="list">
+            <!-- Transactions will be added here by JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        /* --- JavaScript Starts Here (More structured and robust operations) --- */
+
+        // --- DOM Element References ---
+        // Get references to all necessary HTML elements
+        const balanceDisplay = document.getElementById('balance-amount');
+        const incomeDisplay = document.getElementById('income-amount');
+        const expenseDisplay = document.getElementById('expense-amount');
+        const transactionList = document.getElementById('list');
+        const transactionForm = document.getElementById('transaction-form');
+        const descriptionInput = document.getElementById('text');
+        const amountInput = document.getElementById('amount');
+        const categorySelect = document.getElementById('category'); // For adding new transactions
+        const newCategoryInput = document.getElementById('new-category-name');
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        const currentCategoriesDisplay = document.getElementById('current-categories-display');
+        const filterCategorySelect = document.getElementById('filter-category'); // For filtering transactions
+        const expensePieChartCanvas = document.getElementById('expensePieChart');
+
+        // --- Global Variables ---
+        // Chart instance to allow for updating/destroying the chart
+        let expenseChart = null;
+
+        // --- Data Storage (Local Storage) ---
+        // Load transactions from Local Storage or initialize as an empty array
+        // Local Storage only stores strings, so we use JSON.parse() to convert back to an array/object
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+        // Define default categories. These will be present even if no custom ones are added.
+        const defaultCategories = ['Food', 'Transport', 'Shopping', 'Bills', 'Rent', 'Salary', 'Freelance', 'Other'];
+        // Load custom categories from local storage, or use the default set if none exist
+        // We'll store all categories (default + custom) in this 'categories' array
+        let categories = JSON.parse(localStorage.getItem('categories')) || defaultCategories;
+
+        // --- Utility Functions ---
+
+        /**
+         * Generates a simple unique ID for transactions.
+         * In a real-world app, this would be generated by a backend database.
+         * @returns {number} A unique numerical ID.
+         */
+        function generateID() {
+            return Math.floor(Math.random() * 100000000);
+        }
+
+        /**
+         * Saves the current transactions and categories arrays to Local Storage.
+         * Local Storage is a simple client-side storage mechanism.
+         */
+        function updateLocalStorage() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            localStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        // --- Transaction Management Functions ---
+
+        /**
+         * Adds a transaction to the DOM (the webpage's visible list).
+         * @param {object} transaction - The transaction object to display.
+         */
+        function addTransactionDOM(transaction) {
+            // Determine if the transaction is an income or expense for styling purposes
+            const sign = transaction.amount < 0 ? 'minus' : 'plus';
+
+            // Create a new list item element
+            const item = document.createElement('li');
+
+            // Add the appropriate class ('plus' or 'minus') for visual indication
+            item.classList.add(sign);
+
+            // Populate the list item with transaction details using a template literal for readability
+            item.innerHTML = `
+                <div class="transaction-details">
+                    <span class="transaction-description">${transaction.text}</span>
+                    <span class="transaction-date">${transaction.date}</span>
+                </div>
+                <span class="category-tag">${transaction.category}</span>
+                <span>${transaction.amount < 0 ? '-' : '+'}₹${Math.abs(transaction.amount).toFixed(2)}</span>
+                <button class="delete-btn" onclick="confirmDeleteTransaction(${transaction.id})">x</button>
+            `;
+
+            // Append the new transaction item to the transaction list on the page
+            transactionList.appendChild(item);
+        }
+
+        /**
+         * Updates the overall balance, total income, and total expense displays.
+         */
+        function updateValues() {
+            // Get all transaction amounts
+            const amounts = transactions.map(transaction => transaction.amount);
+
+            // Calculate total balance
+            const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
+
+            // Calculate total income (positive amounts)
+            const income = amounts
+                .filter(item => item > 0)
+                .reduce((acc, item) => (acc += item), 0)
+                .toFixed(2);
+
+            // Calculate total expense (absolute value of negative amounts)
+            const expense = (
+                amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1
+            ).toFixed(2);
+
+            // Update the text content of the display elements
+            balanceDisplay.innerText = `₹${total}`;
+            incomeDisplay.innerText = `₹${income}`;
+            expenseDisplay.innerText = `₹${expense}`;
+
+            // Also update the chart when values change
+            updateChart();
+        }
+
+        /**
+         * Prompts the user for confirmation before deleting a transaction.
+         * @param {number} id - The ID of the transaction to potentially delete.
+         */
+        function confirmDeleteTransaction(id) {
+            // Using a native browser confirmation dialog for simplicity
+            if (confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
+                removeTransaction(id);
+            }
+        }
+
+        /**
+         * Removes a transaction from the transactions array by its ID.
+         * @param {number} id - The ID of the transaction to remove.
+         */
+        function removeTransaction(id) {
+            // Filter out the transaction with the matching ID
+            transactions = transactions.filter(transaction => transaction.id !== id);
+            updateLocalStorage(); // Save the updated list to local storage
+            initApp(); // Re-initialize the app to refresh the displayed list and totals
+            alert('Transaction successfully deleted!');
+        }
+
+        /**
+         * Handles the submission of the new transaction form.
+         * @param {Event} e - The submit event object from the form.
+         */
+        function handleTransactionSubmit(e) {
+            e.preventDefault(); // Prevent default form submission (page reload)
+
+            // Validate all input fields
+            if (!descriptionInput.value.trim() || !amountInput.value.trim() || !categorySelect.value.trim()) {
+                alert('Please ensure all transaction fields (Description, Amount, and Category) are filled.');
+                return; // Stop function execution if validation fails
+            }
+
+            // Create a new transaction object
+            const newTransaction = {
+                id: generateID(),
+                text: descriptionInput.value.trim(),
+                amount: +amountInput.value.trim(), // Convert string input to a number
+                category: categorySelect.value.trim(),
+                // Format date for better readability (e.g., "Jul 01, 2025")
+                date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+            };
+
+            transactions.push(newTransaction); // Add to the in-memory array
+
+            addTransactionDOM(newTransaction); // Update the UI
+            updateValues(); // Recalculate and update totals
+            updateLocalStorage(); // Persist data
+
+            // Reset form fields for next entry
+            descriptionInput.value = '';
+            amountInput.value = '';
+            categorySelect.value = ''; // Reset select to default/first option
+            alert('Transaction added successfully!');
+        }
+
+        // --- Category Management Functions ---
+
+        /**
+         * Populates the category dropdown for adding new transactions.
+         */
+        function populateCategoryDropdown() {
+            // Clear existing options, then add a default "Select Category" option
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            // Also clear the filter dropdown and add "Show All"
+            filterCategorySelect.innerHTML = '<option value="All">Show All</option>';
+
+            // Sort categories alphabetically for better user experience
+            const sortedCategories = [...categories].sort();
+
+            sortedCategories.forEach(cat => {
+                // Add to transaction form dropdown
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                categorySelect.appendChild(option);
+
+                // Add to filter dropdown
+                const filterOption = document.createElement('option');
+                filterOption.value = cat;
+                filterOption.textContent = cat;
+                filterCategorySelect.appendChild(filterOption);
+            });
+        }
+
+        /**
+         * Displays current custom categories in the "Manage Categories" section.
+         * Allows users to remove custom categories.
+         */
+        function displayCurrentCategories() {
+            currentCategoriesDisplay.innerHTML = ''; // Clear previous display
+
+            // Filter out default categories as they are not meant to be removed by the user
+            const customCategories = categories.filter(cat => !defaultCategories.includes(cat));
+
+            if (customCategories.length === 0) {
+                currentCategoriesDisplay.innerHTML = '<p style="font-size:0.9em; color:var(--text-color-medium);">No custom categories added yet.</p>';
+            }
+
+            customCategories.forEach(cat => {
+                const tag = document.createElement('span');
+                tag.classList.add('category-tag');
+                tag.style.backgroundColor = 'var(--accent-orange)'; // Use info color for custom tags
+                tag.style.color = 'var(--text-color-dark)';
+                // Add a delete button for custom categories
+                tag.innerHTML = `
+                    ${cat} <button class="remove-category-btn" onclick="removeCategory('${cat}')">x</button>
+                `;
+                currentCategoriesDisplay.appendChild(tag);
+            });
+        }
+
+        /**
+         * Adds a new custom category to the categories list.
+         */
+        function addCategory() {
+            const newCatName = newCategoryInput.value.trim();
+
+            // Validate input
+            if (newCatName === '') {
+                alert('Please enter a category name.');
+                return;
+            }
+            // Check for duplicates (case-insensitive)
+            if (categories.some(cat => cat.toLowerCase() === newCatName.toLowerCase())) {
+                alert(`Category "${newCatName}" already exists.`);
+                return;
+            }
+
+            categories.push(newCatName); // Add to the in-memory array
+            updateLocalStorage(); // Persist changes
+            populateCategoryDropdown(); // Refresh both dropdowns
+            displayCurrentCategories(); // Refresh category display
+            newCategoryInput.value = ''; // Clear input field
+            alert(`Category "${newCatName}" added successfully!`);
+        }
+
+        /**
+         * Removes a custom category from the categories list.
+         * @param {string} catToRemove - The category name to remove.
+         */
+        function removeCategory(catToRemove) {
+            // Crucial check: Prevent removal if the category is used in any existing transactions
+            const isCategoryUsed = transactions.some(t => t.category === catToRemove);
+            if (isCategoryUsed) {
+                alert(`Cannot remove category "${catToRemove}". It is currently used in one or more transactions.`);
+                return;
+            }
+
+            // Confirm deletion with the user
+            if (confirm(`Are you sure you want to remove the category "${catToRemove}"? This cannot be undone.`)) {
+                categories = categories.filter(cat => cat !== catToRemove); // Filter out the category
+                updateLocalStorage(); // Persist changes
+                populateCategoryDropdown(); // Refresh both dropdowns
+                displayCurrentCategories(); // Refresh category display
+                alert(`Category "${catToRemove}" removed.`);
+            }
+        }
+
+        // --- Filtering Functions ---
+
+        /**
+         * Filters and displays transactions based on the selected category.
+         */
+        function filterTransactions() {
+            const selectedCategory = filterCategorySelect.value;
+            let filteredTransactions = [];
+
+            if (selectedCategory === 'All') {
+                filteredTransactions = transactions; // Show all if "Show All" is selected
+            } else {
+                // Filter transactions where the category matches the selected one
+                filteredTransactions = transactions.filter(t => t.category === selectedCategory);
+            }
+
+            // Clear current list and display filtered transactions
+            transactionList.innerHTML = '';
+            if (filteredTransactions.length === 0) {
+                const messageItem = document.createElement('li');
+                messageItem.innerHTML = `<div class="transaction-details"><span class="transaction-description" style="font-style: italic; color: var(--text-color-medium);">No transactions found for this filter.</span></div>`;
+                transactionList.appendChild(messageItem);
+            } else {
+                 filteredTransactions.forEach(addTransactionDOM);
+            }
+            // Note: Totals (balance, income, expense) are NOT re-calculated based on filter,
+            // they always show the total for ALL transactions. This is a design choice.
+        }
+
+        // --- Charting Functions (using Chart.js) ---
+
+        /**
+         * Calculates spending totals per category.
+         * @returns {object} An object where keys are categories and values are total expenses for that category.
+         */
+        function getCategorySpending() {
+            const categoryTotals = {};
+            transactions.forEach(transaction => {
+                if (transaction.amount < 0) { // Only consider expenses (negative amounts) for the pie chart
+                    const category = transaction.category;
+                    const amount = Math.abs(transaction.amount); // Use absolute value for chart
+                    categoryTotals[category] = (categoryTotals[category] || 0) + amount;
+                }
+            });
+            return categoryTotals;
+        }
+
+        /**
+         * Generates a consistent set of colors for the chart.
+         * You can customize these colors.
+         * @param {number} numColors - The number of colors needed.
+         * @returns {string[]} An array of hex color strings.
+         */
+        function generateChartColo
