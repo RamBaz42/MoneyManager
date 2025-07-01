@@ -2,7 +2,7 @@
   "name": "ExpenseFlow App",
   "short_name": "ExpenseFlow",
   "description": "Your Smart Financial Companion for daily expense tracking.",
-  "start_url": "/premium_expense_tracker.html",
+  "start_url": "/MoneyManager/premium_expense_tracker.html",
   "display": "standalone",
   "background_color": "#f8f9fa",
   "theme_color": "#5a80e7",
