@@ -11,9 +11,6 @@
     <!-- Chart.js library for creating charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- PWA: Link to manifest.json -->
-    <link rel="manifest" href="./manifest.json">
-
     <style>
         /* --- CSS Starts Here (Refined for a truly professional look) --- */
 
@@ -28,9 +25,9 @@
 
             --text-color-dark: #2c3e50; /* Deep charcoal for primary text, excellent readability */
             --text-color-medium: #7f8c8d; /* Medium grey for secondary text and subtle hints */
-            --text-color-light: #bdc3c7; /* Very light grey for subtle details/placeholders */
+            --text-color-light: #bdc3c7; /* Light grey for subtle details/placeholders */
 
-            --bg-page: #f8f9fa; /* Very light, almost off-white background for the entire page, soothing */
+            --bg-page: #f8f9fa; /* A very light, almost off-white background for the entire page, soothing */
             --bg-light-alt: #f0f2f5; /* A slightly darker light background for subtle contrast in sections */
             --bg-card: #ffffff; /* Crisp white for main content cards, creating a clean canvas */
             
@@ -42,7 +39,7 @@
             --shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.03); /* Very subtle inner shadow for framed elements like the chart */
 
             --radius-large: 16px; /* Larger border-radius for softer, modern, and friendly look */
-            --radius-small: 8px; /* Standard rounded corners for inputs and smaller buttons */
+            --radius-small: 8px; /* Standard rounded corners for inputs/buttons */
 
             --font-main: 'Inter', sans-serif; /* Inter for all text - highly readable, professional sans-serif */
         }
@@ -441,35 +438,10 @@
             align-items: center;
         }
 
-        /* Spending Insights Section */
-        .insights-section {
-            margin-top: 35px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-medium);
-            text-align: left;
-        }
-
-        .insights-output {
-            background-color: var(--bg-light-alt);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-small);
-            padding: 15px;
-            margin-top: 15px;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-style: italic;
-            color: var(--text-color-medium);
-            text-align: center;
-            line-height: 1.5;
-        }
-
-        .insights-output.loading {
-            font-style: normal;
-            color: var(--primary-blue-dark);
-            font-weight: 500;
-        }
+        /* Spending Insights Section (Removed in this version) */
+        /* .insights-section { ... } */
+        /* .insights-output { ... } */
+        /* .insights-output.loading { ... } */
 
         /* Animations */
         @keyframes fadeIn {
@@ -612,14 +584,9 @@
     </div>
 
     <script>
-        /* --- JavaScript Starts Here (More structured and robust operations) --- */
-        console.log("Script start: Initializing ExpenseFlow."); // ADD THIS LINE HERE
+        // --- SCRIPT EXECUTION START --- // This line is for debugging confirmation.
 
         // --- DOM Element References ---
-        console.log("Script step 1: Getting DOM references."); // ADD THIS LINE HERE
-
-        // --- DOM Element References ---
-        // Get references to all necessary HTML elements
         const balanceDisplay = document.getElementById('balance-amount');
         const incomeDisplay = document.getElementById('income-amount');
         const expenseDisplay = document.getElementById('expense-amount');
@@ -627,46 +594,27 @@
         const transactionForm = document.getElementById('transaction-form');
         const descriptionInput = document.getElementById('text');
         const amountInput = document.getElementById('amount');
-        const categorySelect = document.getElementById('category'); // For adding new transactions
+        const categorySelect = document.getElementById('category');
         const newCategoryInput = document.getElementById('new-category-name');
         const addCategoryBtn = document.getElementById('add-category-btn');
         const currentCategoriesDisplay = document.getElementById('current-categories-display');
-        const filterCategorySelect = document.getElementById('filter-category'); // For filtering transactions
+        const filterCategorySelect = document.getElementById('filter-category');
         const expensePieChartCanvas = document.getElementById('expensePieChart');
 
-        console.log("Script step 2: Initializing global variables."); // ADD THIS LINE HERE
-    
-
         // --- Global Variables ---
-        // Chart instance to allow for updating/destroying the chart
         let expenseChart = null;
 
         // --- Data Storage (Local Storage) ---
-        // Load transactions from Local Storage or initialize as an empty array
-        // Local Storage only stores strings, so we use JSON.parse() to convert back to an array/object
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-
-        // Define default categories. These will be present even if no custom ones are added.
         const defaultCategories = ['Food', 'Transport', 'Shopping', 'Bills', 'Rent', 'Salary', 'Freelance', 'Other'];
-        // Load custom categories from local storage, or use the default set if none exist
-        // We'll store all categories (default + custom) in this 'categories' array
         let categories = JSON.parse(localStorage.getItem('categories')) || defaultCategories;
 
         // --- Utility Functions ---
 
-        /**
-         * Generates a simple unique ID for transactions.
-         * In a real-world app, this would be generated by a backend database.
-         * @returns {number} A unique numerical ID.
-         */
         function generateID() {
             return Math.floor(Math.random() * 100000000);
         }
 
-        /**
-         * Saves the current transactions and categories arrays to Local Storage.
-         * Local Storage is a simple client-side storage mechanism.
-         */
         function updateLocalStorage() {
             localStorage.setItem('transactions', JSON.stringify(transactions));
             localStorage.setItem('categories', JSON.stringify(categories));
@@ -674,21 +622,10 @@
 
         // --- Transaction Management Functions ---
 
-        /**
-         * Adds a transaction to the DOM (the webpage's visible list).
-         * @param {object} transaction - The transaction object to display.
-         */
         function addTransactionDOM(transaction) {
-            // Determine if the transaction is an income or expense for styling purposes
             const sign = transaction.amount < 0 ? 'minus' : 'plus';
-
-            // Create a new list item element
             const item = document.createElement('li');
-
-            // Add the appropriate class ('plus' or 'minus') for visual indication
             item.classList.add(sign);
-
-            // Populate the list item with transaction details using a template literal for readability
             item.innerHTML = `
                 <div class="transaction-details">
                     <span class="transaction-description">${transaction.text}</span>
@@ -698,122 +635,82 @@
                 <span>${transaction.amount < 0 ? '-' : '+'}₹${Math.abs(transaction.amount).toFixed(2)}</span>
                 <button class="delete-btn" onclick="confirmDeleteTransaction(${transaction.id})">x</button>
             `;
-
-            // Append the new transaction item to the transaction list on the page
             transactionList.appendChild(item);
         }
 
-        /**
-         * Updates the overall balance, total income, and total expense displays.
-         */
         function updateValues() {
-            // Get all transaction amounts
             const amounts = transactions.map(transaction => transaction.amount);
-
-            // Calculate total balance
             const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
-
-            // Calculate total income (positive amounts)
             const income = amounts
                 .filter(item => item > 0)
                 .reduce((acc, item) => (acc += item), 0)
                 .toFixed(2);
-
-            // Calculate total expense (absolute value of negative amounts)
             const expense = (
                 amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1
             ).toFixed(2);
 
-            // Update the text content of the display elements
             balanceDisplay.innerText = `₹${total}`;
             incomeDisplay.innerText = `₹${income}`;
             expenseDisplay.innerText = `₹${expense}`;
 
-            // Also update the chart when values change
             updateChart();
         }
 
-        /**
-         * Prompts the user for confirmation before deleting a transaction.
-         * @param {number} id - The ID of the transaction to potentially delete.
-         */
         function confirmDeleteTransaction(id) {
-            // Using a native browser confirmation dialog for simplicity
             if (confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
                 removeTransaction(id);
             }
         }
 
-        /**
-         * Removes a transaction from the transactions array by its ID.
-         * @param {number} id - The ID of the transaction to remove.
-         */
         function removeTransaction(id) {
-            // Filter out the transaction with the matching ID
             transactions = transactions.filter(transaction => transaction.id !== id);
-            updateLocalStorage(); // Save the updated list to local storage
-            initApp(); // Re-initialize the app to refresh the displayed list and totals
+            updateLocalStorage();
+            initApp();
             alert('Transaction successfully deleted!');
         }
 
-        /**
-         * Handles the submission of the new transaction form.
-         * @param {Event} e - The submit event object from the form.
-         */
         function handleTransactionSubmit(e) {
-            e.preventDefault(); // Prevent default form submission (page reload)
+            e.preventDefault();
 
-            // Validate all input fields
             if (!descriptionInput.value.trim() || !amountInput.value.trim() || !categorySelect.value.trim()) {
                 alert('Please ensure all transaction fields (Description, Amount, and Category) are filled.');
-                return; // Stop function execution if validation fails
+                return;
             }
 
-            // Create a new transaction object
             const newTransaction = {
                 id: generateID(),
                 text: descriptionInput.value.trim(),
-                amount: +amountInput.value.trim(), // Convert string input to a number
+                amount: +amountInput.value.trim(),
                 category: categorySelect.value.trim(),
-                // Format date for better readability (e.g., "Jul 01, 2025")
                 date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
             };
 
-            transactions.push(newTransaction); // Add to the in-memory array
+            transactions.push(newTransaction);
 
-            addTransactionDOM(newTransaction); // Update the UI
-            updateValues(); // Recalculate and update totals
-            updateLocalStorage(); // Persist data
+            addTransactionDOM(newTransaction);
+            updateValues();
+            updateLocalStorage();
 
-            // Reset form fields for next entry
             descriptionInput.value = '';
             amountInput.value = '';
-            categorySelect.value = ''; // Reset select to default/first option
+            categorySelect.value = '';
             alert('Transaction added successfully!');
         }
 
         // --- Category Management Functions ---
 
-        /**
-         * Populates the category dropdown for adding new transactions.
-         */
         function populateCategoryDropdown() {
-            // Clear existing options, then add a default "Select Category" option
             categorySelect.innerHTML = '<option value="">Select Category</option>';
-            // Also clear the filter dropdown and add "Show All"
             filterCategorySelect.innerHTML = '<option value="All">Show All</option>';
 
-            // Sort categories alphabetically for better user experience
             const sortedCategories = [...categories].sort();
 
             sortedCategories.forEach(cat => {
-                // Add to transaction form dropdown
                 const option = document.createElement('option');
                 option.value = cat;
                 option.textContent = cat;
                 categorySelect.appendChild(option);
 
-                // Add to filter dropdown
                 const filterOption = document.createElement('option');
                 filterOption.value = cat;
                 filterOption.textContent = cat;
@@ -821,14 +718,9 @@
             });
         }
 
-        /**
-         * Displays current custom categories in the "Manage Categories" section.
-         * Allows users to remove custom categories.
-         */
         function displayCurrentCategories() {
-            currentCategoriesDisplay.innerHTML = ''; // Clear previous display
+            currentCategoriesDisplay.innerHTML = '';
 
-            // Filter out default categories as they are not meant to be removed by the user
             const customCategories = categories.filter(cat => !defaultCategories.includes(cat));
 
             if (customCategories.length === 0) {
@@ -838,9 +730,8 @@
             customCategories.forEach(cat => {
                 const tag = document.createElement('span');
                 tag.classList.add('category-tag');
-                tag.style.backgroundColor = 'var(--accent-orange)'; // Use info color for custom tags
+                tag.style.backgroundColor = 'var(--accent-orange)';
                 tag.style.color = 'var(--text-color-dark)';
-                // Add a delete button for custom categories
                 tag.innerHTML = `
                     ${cat} <button class="remove-category-btn" onclick="removeCategory('${cat}')">x</button>
                 `;
@@ -848,70 +739,54 @@
             });
         }
 
-        /**
-         * Adds a new custom category to the categories list.
-         */
         function addCategory() {
             const newCatName = newCategoryInput.value.trim();
 
-            // Validate input
             if (newCatName === '') {
                 alert('Please enter a category name.');
                 return;
             }
-            // Check for duplicates (case-insensitive)
             if (categories.some(cat => cat.toLowerCase() === newCatName.toLowerCase())) {
                 alert(`Category "${newCatName}" already exists.`);
                 return;
             }
 
-            categories.push(newCatName); // Add to the in-memory array
-            updateLocalStorage(); // Persist changes
-            populateCategoryDropdown(); // Refresh both dropdowns
-            displayCurrentCategories(); // Refresh category display
-            newCategoryInput.value = ''; // Clear input field
+            categories.push(newCatName);
+            updateLocalStorage();
+            populateCategoryDropdown();
+            displayCurrentCategories();
+            newCategoryInput.value = '';
             alert(`Category "${newCatName}" added successfully!`);
         }
 
-        /**
-         * Removes a custom category from the categories list.
-         * @param {string} catToRemove - The category name to remove.
-         */
         function removeCategory(catToRemove) {
-            // Crucial check: Prevent removal if the category is used in any existing transactions
             const isCategoryUsed = transactions.some(t => t.category === catToRemove);
             if (isCategoryUsed) {
                 alert(`Cannot remove category "${catToRemove}". It is currently used in one or more transactions.`);
                 return;
             }
 
-            // Confirm deletion with the user
             if (confirm(`Are you sure you want to remove the category "${catToRemove}"? This cannot be undone.`)) {
-                categories = categories.filter(cat => cat !== catToRemove); // Filter out the category
-                updateLocalStorage(); // Persist changes
-                populateCategoryDropdown(); // Refresh both dropdowns
-                displayCurrentCategories(); // Refresh category display
+                categories = categories.filter(cat => cat !== catToRemove);
+                updateLocalStorage();
+                populateCategoryDropdown();
+                displayCurrentCategories();
                 alert(`Category "${catToRemove}" removed.`);
             }
         }
 
         // --- Filtering Functions ---
 
-        /**
-         * Filters and displays transactions based on the selected category.
-         */
         function filterTransactions() {
             const selectedCategory = filterCategorySelect.value;
             let filteredTransactions = [];
 
             if (selectedCategory === 'All') {
-                filteredTransactions = transactions; // Show all if "Show All" is selected
+                filteredTransactions = transactions;
             } else {
-                // Filter transactions where the category matches the selected one
                 filteredTransactions = transactions.filter(t => t.category === selectedCategory);
             }
 
-            // Clear current list and display filtered transactions
             transactionList.innerHTML = '';
             if (filteredTransactions.length === 0) {
                 const messageItem = document.createElement('li');
@@ -920,32 +795,143 @@
             } else {
                  filteredTransactions.forEach(addTransactionDOM);
             }
-            // Note: Totals (balance, income, expense) are NOT re-calculated based on filter,
-            // they always show the total for ALL transactions. This is a design choice.
         }
 
         // --- Charting Functions (using Chart.js) ---
 
-        /**
-         * Calculates spending totals per category.
-         * @returns {object} An object where keys are categories and values are total expenses for that category.
-         */
         function getCategorySpending() {
             const categoryTotals = {};
             transactions.forEach(transaction => {
-                if (transaction.amount < 0) { // Only consider expenses (negative amounts) for the pie chart
+                if (transaction.amount < 0) {
                     const category = transaction.category;
-                    const amount = Math.abs(transaction.amount); // Use absolute value for chart
+                    const amount = Math.abs(transaction.amount);
                     categoryTotals[category] = (categoryTotals[category] || 0) + amount;
                 }
             });
             return categoryTotals;
         }
 
-        /**
-         * Generates a consistent set of colors for the chart.
-         * You can customize these colors.
-         * @param {number} numColors - The number of colors needed.
-         * @returns {string[]} An array of hex color strings.
-         */
-        function generateChartColo
+        function generateChartColors(numColors) {
+            const baseColors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                '#E7E9ED', '#7C4DFF', '#00BCD4', '#CDDC39', '#FFEB3B', '#FF5722',
+                '#8D6E63', '#9E9E9E', '#607D8B', '#F06292', '#BA68C8', '#64B5F6'
+            ];
+            return Array.from({ length: numColors }, (_, i) => baseColors[i % baseColors.length]);
+        }
+
+        function updateChart() {
+            const categorySpending = getCategorySpending();
+            const labels = Object.keys(categorySpending);
+            const data = Object.values(categorySpending);
+            const backgroundColors = generateChartColors(labels.length);
+
+            if (expenseChart) {
+                expenseChart.destroy();
+            }
+
+            if (labels.length > 0) {
+                expensePieChartCanvas.style.display = 'block';
+                const chartContainer = expensePieChartCanvas.parentNode;
+                const noDataMessage = chartContainer.querySelector('.no-data-message');
+                if (noDataMessage) {
+                    chartContainer.removeChild(noDataMessage);
+                }
+
+                expenseChart = new Chart(expensePieChartCanvas, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: backgroundColors,
+                            hoverOffset: 10,
+                            borderColor: 'white',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        family: 'Inter',
+                                        size: 12
+                                    },
+                                    color: 'var(--text-color-dark)',
+                                    boxWidth: 20,
+                                    padding: 15
+                                }
+                            },
+                            title: {
+                                display: false,
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += `₹${context.parsed.toFixed(2)}`;
+                                        }
+                                        return label;
+                                    }
+                                },
+                                bodyFont: {
+                                    family: 'Inter',
+                                    size: 14
+                                },
+                                titleFont: {
+                                    family: 'Inter',
+                                    size: 14
+                                },
+                                padding: 10,
+                                boxPadding: 5
+                            }
+                        },
+                        animation: {
+                            animateRotate: true,
+                            animateScale: true
+                        }
+                    }
+                });
+            } else {
+                expensePieChartCanvas.style.display = 'none';
+                const chartContainer = expensePieChartCanvas.parentNode;
+                if (!chartContainer.querySelector('.no-data-message')) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'no-data-message';
+                    messageDiv.style.cssText = 'text-align: center; color: var(--text-color-medium); font-style: italic; padding: 20px;';
+                    messageDiv.textContent = 'Add expenses to see your spending breakdown!';
+                    chartContainer.appendChild(messageDiv);
+                }
+            }
+        }
+
+        // --- Application Initialization ---
+
+        function initApp() {
+            transactionList.innerHTML = '';
+            transactions.forEach(addTransactionDOM);
+            updateValues();
+            populateCategoryDropdown();
+            displayCurrentCategories();
+            filterCategorySelect.value = 'All';
+            updateChart();
+        }
+
+        // --- Event Listeners ---
+        transactionForm.addEventListener('submit', handleTransactionSubmit);
+        addCategoryBtn.addEventListener('click', addCategory);
+        filterCategorySelect.addEventListener('change', filterTransactions);
+
+        // --- Initial Application Load ---
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
