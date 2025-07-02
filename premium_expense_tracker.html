@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js library for creating charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         /* --- CSS Starts Here (Refined for a truly professional look) --- */
 
@@ -21,13 +20,13 @@
             --soft-green: #2ecc71; /* Gentle green for income/positive elements */
             --soft-red: #e74c3c; /* Muted red for expenses/negative elements */
             --accent-orange: #FF9800; /* Warm orange for custom category tags */
-            --info-color: #2196F3; /* Standard blue for informational elements */
+            --info-color: #2196F3; /* Blue for informational elements */
 
             --text-color-dark: #2c3e50; /* Deep charcoal for primary text, excellent readability */
             --text-color-medium: #7f8c8d; /* Medium grey for secondary text and subtle hints */
             --text-color-light: #bdc3c7; /* Light grey for subtle details/placeholders */
 
-            --bg-page: #f8f9fa; /* A very light, almost off-white background for the entire page, soothing */
+            --bg-page: #f8f9fa; /* Very light, cool background for the entire page */
             --bg-light-alt: #f0f2f5; /* A slightly darker light background for subtle contrast in sections */
             --bg-card: #ffffff; /* Crisp white for main content cards, creating a clean canvas */
             
@@ -46,7 +45,7 @@
 
         /* Basic reset and font application */
         * {
-            box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
@@ -314,23 +313,42 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Delete button within list item */
-        .delete-btn {
+        /* Buttons within list item (Edit and Delete) */
+        .list-item-buttons {
+            display: flex;
+            gap: 8px; /* Space between edit and delete buttons */
+            margin-left: 15px; /* Space from amount */
+        }
+
+        .edit-btn, .delete-btn {
             cursor: pointer;
-            background-color: var(--soft-red); /* Use soft-red for delete button */
             border: none;
             color: #fff;
-            font-size: 1.2em;
-            padding: 10px 14px;
+            font-size: 0.9em; /* Smaller font for these action buttons */
+            padding: 6px 10px; /* Smaller padding */
             border-radius: var(--radius-small);
             transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-left: 20px;
+            white-space: nowrap; /* Keep text on one line */
+        }
+
+        .edit-btn {
+            background-color: var(--info-color); /* Blue for edit */
+        }
+
+        .edit-btn:hover {
+            background-color: #1976D2; /* Darker blue on hover */
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background-color: var(--soft-red); /* Red for delete */
         }
 
         .delete-btn:hover {
-            background-color: #d32f2f;
+            background-color: #d32f2f; /* Darker red on hover */
             transform: scale(1.05);
         }
+
 
         /* Category Management Section */
         .category-management {
@@ -545,7 +563,7 @@
                     <!-- Categories will be dynamically loaded here by JS -->
                 </select>
             </div>
-            <button class="btn">Add Transaction</button>
+            <button class="btn" id="add-update-btn">Add Transaction</button>
         </form>
 
         <div class="category-management">
@@ -595,6 +613,7 @@
         const descriptionInput = document.getElementById('text');
         const amountInput = document.getElementById('amount');
         const categorySelect = document.getElementById('category');
+        const addUpdateBtn = document.getElementById('add-update-btn'); // Reference to the Add/Update button
         const newCategoryInput = document.getElementById('new-category-name');
         const addCategoryBtn = document.getElementById('add-category-btn');
         const currentCategoriesDisplay = document.getElementById('current-categories-display');
@@ -603,6 +622,7 @@
 
         // --- Global Variables ---
         let expenseChart = null;
+        let editingTransactionId = null; // To store the ID of the transaction being edited
 
         // --- Data Storage (Local Storage) ---
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -633,7 +653,10 @@
                 </div>
                 <span class="category-tag">${transaction.category}</span>
                 <span>${transaction.amount < 0 ? '-' : '+'}₹${Math.abs(transaction.amount).toFixed(2)}</span>
-                <button class="delete-btn" onclick="confirmDeleteTransaction(${transaction.id})">x</button>
+                <div class="list-item-buttons">
+                    <button class="edit-btn" onclick="editTransaction(${transaction.id})">Edit</button>
+                    <button class="delete-btn" onclick="confirmDeleteTransaction(${transaction.id})">x</button>
+                </div>
             `;
             transactionList.appendChild(item);
         }
@@ -669,32 +692,72 @@
             alert('Transaction successfully deleted!');
         }
 
+        // New function to handle editing a transaction
+        function editTransaction(id) {
+            const transactionToEdit = transactions.find(t => t.id === id);
+            if (transactionToEdit) {
+                // Populate the form fields with the transaction's current details
+                descriptionInput.value = transactionToEdit.text;
+                amountInput.value = transactionToEdit.amount;
+                categorySelect.value = transactionToEdit.category;
+
+                // Store the ID of the transaction being edited
+                editingTransactionId = id;
+
+                // Change the button text and style to indicate "Update" mode
+                addUpdateBtn.textContent = 'Update Transaction';
+                addUpdateBtn.style.background = 'linear-gradient(90deg, var(--info-color) 0%, #1976D2 100%)'; // Blue for update button
+
+                // Scroll to the top of the page to bring the form into view
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
         function handleTransactionSubmit(e) {
             e.preventDefault();
 
+            // Validate all input fields
             if (!descriptionInput.value.trim() || !amountInput.value.trim() || !categorySelect.value.trim()) {
                 alert('Please ensure all transaction fields (Description, Amount, and Category) are filled.');
                 return;
             }
 
-            const newTransaction = {
-                id: generateID(),
-                text: descriptionInput.value.trim(),
-                amount: +amountInput.value.trim(),
-                category: categorySelect.value.trim(),
-                date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-            };
+            if (editingTransactionId !== null) {
+                // If we are in edit mode, update the existing transaction
+                transactions = transactions.map(t =>
+                    t.id === editingTransactionId
+                        ? {
+                            ...t, // Keep existing properties like ID, date
+                            text: descriptionInput.value.trim(),
+                            amount: +amountInput.value.trim(),
+                            category: categorySelect.value.trim()
+                        }
+                        : t // Return other transactions as is
+                );
+                alert('Transaction updated successfully!');
+                editingTransactionId = null; // Reset edit mode
+                addUpdateBtn.textContent = 'Add Transaction'; // Change button back
+                addUpdateBtn.style.background = 'linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%)'; // Reset button color
+            } else {
+                // If not in edit mode, add a new transaction
+                const newTransaction = {
+                    id: generateID(),
+                    text: descriptionInput.value.trim(),
+                    amount: +amountInput.value.trim(),
+                    category: categorySelect.value.trim(),
+                    date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                };
+                transactions.push(newTransaction);
+                alert('Transaction added successfully!');
+            }
 
-            transactions.push(newTransaction);
+            updateLocalStorage(); // Save changes to local storage
+            initApp(); // Re-initialize the app to refresh the displayed list and totals
 
-            addTransactionDOM(newTransaction);
-            updateValues();
-            updateLocalStorage();
-
+            // Clear form fields after submission/update
             descriptionInput.value = '';
             amountInput.value = '';
             categorySelect.value = '';
-            alert('Transaction added successfully!');
         }
 
         // --- Category Management Functions ---
