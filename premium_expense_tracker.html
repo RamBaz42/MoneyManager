@@ -613,6 +613,10 @@
 
     <script>
         /* --- JavaScript Starts Here (More structured and robust operations) --- */
+        console.log("Script start: Initializing ExpenseFlow."); // ADD THIS LINE HERE
+
+        // --- DOM Element References ---
+        console.log("Script step 1: Getting DOM references."); // ADD THIS LINE HERE
 
         // --- DOM Element References ---
         // Get references to all necessary HTML elements
@@ -629,6 +633,9 @@
         const currentCategoriesDisplay = document.getElementById('current-categories-display');
         const filterCategorySelect = document.getElementById('filter-category'); // For filtering transactions
         const expensePieChartCanvas = document.getElementById('expensePieChart');
+
+        console.log("Script step 2: Initializing global variables."); // ADD THIS LINE HERE
+    
 
         // --- Global Variables ---
         // Chart instance to allow for updating/destroying the chart
