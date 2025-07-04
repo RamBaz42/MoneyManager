@@ -13,9 +13,9 @@
     <style>
         /* --- CSS Starts Here --- */
         :root {
-            /* Light Theme Colors (NEW Vibrant Yellow, inspired by screenshot) */
-            --primary-blue: #FDCB0A; /* Vibrant Yellow from reference */
-            --primary-blue-dark: #E8B900; /* Darker shade for hover */
+            /* Light Theme Colors (Vibrant Yellow) */
+            --primary-blue: #FDCB0A;
+            --primary-blue-dark: #E8B900;
             --soft-green: #2ecc71; 
             --soft-red: #e74c3c;
             --accent-orange: #FF9800;
@@ -339,19 +339,32 @@
             background-color: var(--primary-accent-dark);
         }
         
+        /* FIX 1: Input Box Design */
         .input-with-mic {
             display: flex;
             align-items: center;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-small);
+            background-color: var(--bg-light-alt);
+            transition: all 0.3s ease;
+            overflow: hidden; /* Prevent children from breaking border radius */
+        }
+        .input-with-mic:focus-within {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(253, 203, 10, 0.35);
+            background-color: var(--bg-card);
+        }
+        [data-theme="dark"] .input-with-mic:focus-within {
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 4px rgba(196, 229, 56, 0.25);
         }
         .mic-btn-container {
             padding: 0 12px;
-            background-color: var(--bg-light-alt);
-            border: 1px solid var(--border-medium);
-            border-right: none;
-            border-radius: var(--radius-small) 0 0 var(--radius-small);
-            height: 53px;
+            height: 51px;
             display: flex;
             align-items: center;
+            background-color: transparent;
+            border: none; /* Remove border from container */
         }
         .mic-btn {
             background: none;
@@ -389,32 +402,21 @@
             100% { transform: scale(1); }
         }
         
-        .input-with-mic input, .select-wrapper {
-            border-radius: 0 var(--radius-small) var(--radius-small) 0;
-            border-left: none;
-            transition: all 0.3s ease;
-        }
-        
-        input[type="text"], input[type="number"], input[type="date"] {
-            font-family: var(--font-main);
-            border: 1px solid var(--border-medium);
-            border-radius: var(--radius-small);
-            display: block;
-            font-size: 1.05em;
+        input[type="text"], input[type="number"], input[type="date"], .select-wrapper {
+            border: none; /* Remove individual borders */
+            background-color: transparent;
+            flex-grow: 1;
+            height: 51px;
             padding: 15px;
-            width: 100%;
-            background-color: var(--bg-light-alt);
+            font-family: var(--font-main);
+            font-size: 1.05em;
             color: var(--text-color-dark);
+            width: 100%;
         }
-
         .select-wrapper {
             position: relative;
-            flex-grow: 1;
-            height: 53px;
-            background-color: var(--bg-light-alt);
-            border: 1px solid var(--border-medium);
+            padding: 0;
         }
-
         .select-wrapper::after {
             content: '▼';
             font-size: 12px;
@@ -438,17 +440,13 @@
             font-size: 1.05em;
             color: var(--text-color-dark);
             cursor: pointer;
-            border-radius: 0;
         }
 
-        select#category:invalid {
+        /* FIX 3: Style for placeholder color */
+        select.placeholder-shown {
            color: var(--text-color-medium);
         }
-
-        [data-theme="dark"] .input-with-mic select {
-            background-color: var(--bg-light-alt);
-        }
-
+        
         [data-theme="dark"] select option {
             background: var(--bg-card);
             color: var(--text-color-dark);
@@ -464,17 +462,6 @@
         }
         .glowing {
             animation: rainbow-glow 2.5s linear infinite;
-        }
-
-        input:focus, .select-wrapper:focus-within {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(253, 203, 10, 0.35); /* Updated focus color */
-            background-color: var(--bg-card);
-        }
-        [data-theme="dark"] input:focus, [data-theme="dark"] .select-wrapper:focus-within {
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 0 4px rgba(196, 229, 56, 0.25);
         }
 
         .btn {
@@ -620,9 +607,10 @@
             color: #313131;
             border-color: #313131;
         }
+        /* FIX 4.1: Hover animation for nav buttons */
         .month-nav-btn:hover {
             background-color: rgba(0,0,0,0.1);
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
         [data-theme="dark"] .month-nav-btn:hover {
             background-color: rgba(0,0,0,0.2);
@@ -634,10 +622,15 @@
         .month-display {
             font-family: var(--font-main);
             font-size: 1.3em;
-            font-weight: 600;
+            font-weight: 700; /* FIX 2: Bolder font */
             color: #313131;
             flex-grow: 1;
             text-align: center;
+            cursor: pointer; /* FIX 4.2: Make clickable */
+            transition: transform 0.2s ease;
+        }
+        .month-display:hover {
+            transform: scale(1.1); /* FIX 4.2: Add hover effect */
         }
         [data-theme="dark"] .month-display {
             color: #313131;
@@ -991,6 +984,19 @@
             align-items: center;
         }
         
+        /* FIX 4.2: Styles for the new month/year picker modal */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .selection-grid .btn {
+            margin-top: 0;
+            padding: 12px 5px;
+            font-size: 1em;
+        }
+
         .coin-animation {
             position: absolute;
             width: 30px;
@@ -1183,7 +1189,7 @@
                      <div class="input-with-mic">
                         <div class="mic-btn-container"><button type="button" class="mic-btn" data-field="category"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg></button></div>
                         <div class="select-wrapper">
-                            <select id="category" required></select>
+                            <select id="category" required class="placeholder-shown"></select>
                         </div>
                     </div>
                 </div>
@@ -1287,6 +1293,17 @@
         </div>
     </div>
 
+    <!-- FIX 4.2: New Modal for Month/Year Picker -->
+    <div id="month-year-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="close-month-year-modal-btn">&times;</button>
+            <h3 id="month-year-modal-title">Select Year</h3>
+            <div id="month-year-selection-grid" class="selection-grid">
+                <!-- Year/Month buttons will be injected here by JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- DOM Element References ---
@@ -1345,6 +1362,11 @@
         const micButtons = document.querySelectorAll('.mic-btn');
         const masterMicBtn = document.getElementById('master-mic-btn');
         const userNameInput = document.getElementById('user-name-input');
+        // FIX 4.2: Month/Year Picker Modal elements
+        const monthYearModalOverlay = document.getElementById('month-year-modal-overlay');
+        const closeMonthYearModalBtn = document.getElementById('close-month-year-modal-btn');
+        const monthYearModalTitle = document.getElementById('month-year-modal-title');
+        const monthYearSelectionGrid = document.getElementById('month-year-selection-grid');
         
         // --- Global State ---
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -1361,7 +1383,8 @@
         let activeVoiceBox = null;
         let voiceState = 'idle'; 
         let amountType = null; 
-
+        let lastGreetingTime = null; // FIX 2: Variable to track greeting time
+        let selectedYearForPicker = null; // FIX 4.2: Variable for picker
 
         // --- Web Speech API Setup ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1499,14 +1522,28 @@
             const field = micBtn.dataset.field;
             
             if (field === 'master') {
-                const userName = userNameInput.value.trim();
-                const greeting = userName ? `Hello ${userName}, my friend. Let's do the entries.` : "Let's do the entries.";
-                voiceState = 'master_awaiting_date';
-                speak(greeting, () => {
-                    updateInteractionBox('What is the date?');
-                    highlightField(transactionDateInput);
-                    if (!isListening) recognition.start();
-                });
+                // FIX 2 & 3: Smarter greeting and fixed voice prompt flow
+                const startMainFlow = () => {
+                    voiceState = 'master_awaiting_date';
+                    speak("What is the date?", () => { // Always speak the first question
+                        updateInteractionBox('What is the date?');
+                        highlightField(transactionDateInput.closest('.input-with-mic'));
+                        if (!isListening) recognition.start();
+                    });
+                };
+
+                const now = new Date();
+                const fiveMinutes = 5 * 60 * 1000;
+                if (!lastGreetingTime || (now - lastGreetingTime > fiveMinutes)) {
+                    lastGreetingTime = now;
+                    updateLocalStorage(); // Save the new greeting time
+                    const userName = userNameInput.value.trim();
+                    const greeting = userName ? `Hello ${userName}, my friend. Let's do the entries.` : "Let's do the entries.";
+                    speak(greeting, startMainFlow); // Start main flow after greeting
+                } else {
+                    startMainFlow(); // Start main flow directly if no greeting is needed
+                }
+
             } else if (field === 'amount') {
                 voiceState = 'awaiting_type';
                 speak('Is this an Income or an Expense?', () => {
@@ -1614,10 +1651,10 @@
             total += currentNumber;
             return total > 0 ? total : null;
         }
-
+        
         function parseSpokenDate(text) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const today = new Date(); 
+            today.setHours(0, 0, 0, 0); 
             text = text.toLowerCase().replace(/(\d+)(st|nd|rd|th)/, '$1');
 
             if (text.includes('today')) return today;
@@ -1640,11 +1677,11 @@
             if (dayOfWeekMatch) {
                 const targetDay = weekdays[dayOfWeekMatch[2]];
                 let date = new Date(today);
-                let dayDiff = today.getDay() - targetDay;
+                let dayDiff = date.getDay() - targetDay;
                 if (dayDiff <= 0) {
                     dayDiff += 7;
                 }
-                date.setDate(today.getDate() - dayDiff);
+                date.setDate(date.getDate() - dayDiff);
                 return date;
             }
 
@@ -1690,7 +1727,7 @@
             }
 
             if (day !== undefined && month !== undefined) {
-                return new Date(Date.UTC(year, month, day));
+                return new Date(year, month, day);
             }
 
             return null;
@@ -1723,8 +1760,8 @@
                     case 'master_awaiting_date':
                         const date = parseSpokenDate(lowerCaseText);
                         if (date) {
-                            transactionDateInput.value = date.toISOString().split('T')[0];
-                            continueConversation('Date set. Now, what is the category?', categorySelect, 'master_awaiting_category');
+                            transactionDateInput.value = formatDateToYYYYMMDD(date);
+                            continueConversation('Date set. Now, what is the category?', categorySelect.closest('.input-with-mic'), 'master_awaiting_category');
                         } else {
                             retry("Sorry, I didn't understand that date. Please try again.");
                         }
@@ -1733,7 +1770,8 @@
                         const foundCategory = categories.find(cat => cat.toLowerCase() === lowerCaseText);
                         if (foundCategory) {
                             categorySelect.value = foundCategory;
-                            continueConversation('Category set. Is this an income or an expense?', amountInput, 'master_awaiting_amount_type');
+                            categorySelect.dispatchEvent(new Event('change')); // Trigger change to update style
+                            continueConversation('Category set. Is this an income or an expense?', amountInput.closest('.input-with-mic'), 'master_awaiting_amount_type');
                         } else {
                             speak(`'${text}' is not a category. Please add it with the plus button and start again.`, () => {
                                 updateInteractionBox(`'${text}' is not a category. Please add it with the '+' button and start again.`, text);
@@ -1744,10 +1782,10 @@
                     case 'master_awaiting_amount_type':
                         if (lowerCaseText.includes('income')) {
                             amountType = 'income';
-                            continueConversation('Okay, income. What is the amount?', amountInput, 'master_awaiting_amount_value');
+                            continueConversation('Okay, income. What is the amount?', amountInput.closest('.input-with-mic'), 'master_awaiting_amount_value');
                         } else if (lowerCaseText.includes('expense')) {
                             amountType = 'expense';
-                            continueConversation('Okay, expense. What is the amount?', amountInput, 'master_awaiting_amount_value');
+                            continueConversation('Okay, expense. What is the amount?', amountInput.closest('.input-with-mic'), 'master_awaiting_amount_value');
                         } else {
                             retry("Please say 'income' or 'expense'.");
                         }
@@ -1756,7 +1794,7 @@
                         const amount = parseSpokenAmount(lowerCaseText);
                         if (amount !== null) {
                             amountInput.value = amountType === 'expense' ? -Math.abs(amount) : Math.abs(amount);
-                            continueConversation('Amount set. Finally, what is the description?', descriptionInput, 'master_awaiting_description');
+                            continueConversation('Amount set. Finally, what is the description?', descriptionInput.closest('.input-with-mic'), 'master_awaiting_description');
                         } else {
                             retry("Sorry, I couldn't understand that amount. Please try again.");
                         }
@@ -1817,6 +1855,7 @@
                     const foundCategory = categories.find(cat => cat.toLowerCase() === lowerCaseText);
                     if (foundCategory) {
                         categorySelect.value = foundCategory;
+                        categorySelect.dispatchEvent(new Event('change'));
                         updateInteractionBox('Category selected!', text);
                     } else {
                         updateInteractionBox(`'${text}' is not in your list. Please add it using the '+' button.`, text);
@@ -1827,7 +1866,7 @@
                 case 'date':
                     const date = parseSpokenDate(lowerCaseText);
                     if (date) {
-                        transactionDateInput.value = date.toISOString().split('T')[0];
+                        transactionDateInput.value = formatDateToYYYYMMDD(date);
                         updateInteractionBox('Date updated!', text);
                     } else {
                         updateInteractionBox(`Sorry, I didn't understand that date.`, text);
@@ -1856,12 +1895,13 @@
             });
         });
         
-        // --- Utility Functions (Existing and Refined) ---
+        // --- Utility Functions ---
         const generateID = () => Math.floor(Math.random() * 100000000);
         const updateLocalStorage = () => {
             localStorage.setItem('transactions', JSON.stringify(transactions));
             localStorage.setItem('categories', JSON.stringify(categories));
             localStorage.setItem('userName', userNameInput.value);
+            localStorage.setItem('lastGreetingTime', lastGreetingTime ? lastGreetingTime.toISOString() : '');
         };
         const formatIndianCurrency = (amount) => {
             const absAmount = Math.abs(amount);
@@ -1875,10 +1915,17 @@
             const [year, month, day] = dateString.split('-').map(Number);
             return new Date(year, month - 1, day);
         };
+        
+        const formatDateToYYYYMMDD = (date) => {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
 
         const formatDateForDisplay = (dateObj) => dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-        // --- Tab Management (Existing) ---
+        // --- Tab Management ---
         function showTab(tabId) {
             tabContents.forEach(content => content.classList.remove('active'));
             tabButtons.forEach(button => button.classList.remove('active'));
@@ -1889,7 +1936,7 @@
             else if (tabId === 'summary') updateSummaryDisplay();
         }
 
-        // --- Transaction Management (Existing) ---
+        // --- Transaction Management ---
         function addTransactionDOM(transaction, targetList) {
             const sign = transaction.amount < 0 ? 'minus' : 'plus';
             const item = document.createElement('li');
@@ -1941,6 +1988,7 @@
                 descriptionInput.value = transactionToEdit.text;
                 amountInput.value = transactionToEdit.amount;
                 categorySelect.value = transactionToEdit.category;
+                categorySelect.dispatchEvent(new Event('change'));
                 transactionDateInput.value = transactionToEdit.date;
                 editingTransactionId = id;
                 addUpdateBtn.textContent = 'Update Transaction';
@@ -1972,13 +2020,14 @@
             updateLocalStorage();
             initApp();
             transactionForm.reset();
-            transactionDateInput.value = new Date().toISOString().split('T')[0];
+            categorySelect.dispatchEvent(new Event('change'));
+            transactionDateInput.value = formatDateToYYYYMMDD(new Date());
         });
 
-        // --- Category Management (Existing) ---
+        // --- Category Management ---
         function populateCategoryDropdown() {
             const currentValue = categorySelect.value;
-            categorySelect.innerHTML = '<option value="" disabled>Select Category</option>';
+            categorySelect.innerHTML = '<option value="">Select Category</option>'; // FIX 3: Make placeholder selectable
             [...categories].sort().forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
@@ -1986,6 +2035,7 @@
                 categorySelect.appendChild(option);
             });
             categorySelect.value = currentValue;
+            categorySelect.dispatchEvent(new Event('change'));
         }
         
         function addCategory() {
@@ -1996,11 +2046,12 @@
             updateLocalStorage();
             populateCategoryDropdown();
             categorySelect.value = newCatName;
+            categorySelect.dispatchEvent(new Event('change'));
             newCategoryModalInput.value = '';
             addCategoryModal.classList.remove('active');
         };
 
-        // --- Charting Functions (Existing) ---
+        // --- Charting Functions ---
         function getCategorySpending(transactionsToChart) {
             const categoryTotals = {};
             transactionsToChart.forEach(t => {
@@ -2047,7 +2098,7 @@
             }
         }
 
-        // --- Animations (Existing) ---
+        // --- Animations ---
         function triggerCoinAnimation() {
             const coin = document.createElement('div');
             coin.className = 'coin-animation';
@@ -2067,7 +2118,7 @@
             }, 1200);
         }
 
-        // --- Tab Content Updates (Refined) ---
+        // --- Tab Content Updates ---
         function updateOverviewDisplay() {
             const monthlyTransactions = transactions.filter(t => {
                 const d = parseDateString(t.date);
@@ -2086,8 +2137,8 @@
 
         function filterAnalysisTransactions(periodType, startDate, endDate = null) {
             let filteredTransactions = [];
-            let actualStartDate = parseDateString(startDate.toISOString().split('T')[0]);
-            let actualEndDate = endDate ? parseDateString(endDate.toISOString().split('T')[0]) : new Date(actualStartDate); 
+            let actualStartDate = parseDateString(formatDateToYYYYMMDD(startDate));
+            let actualEndDate = endDate ? parseDateString(formatDateToYYYYMMDD(endDate)) : new Date(actualStartDate); 
             actualEndDate.setHours(23, 59, 59, 999);
 
             if (periodType === 'day') {
@@ -2140,7 +2191,7 @@
             updateSummaryDisplays(transactions, overallBalanceDisplay, overallIncomeDisplay, overallExpenseDisplay);
         }
 
-        // --- Summary Chart Modal (Refined) ---
+        // --- Summary Chart Modal ---
         function openSummaryChartModal(dataType) {
             currentSummaryChartType = dataType;
             summaryChartModalTitle.textContent = `Monthly ${dataType.charAt(0).toUpperCase() + dataType.slice(1)} Summary`;
@@ -2266,19 +2317,67 @@
             }
 
             userNameInput.value = localStorage.getItem('userName') || '';
+            const savedGreetingTime = localStorage.getItem('lastGreetingTime');
+            if (savedGreetingTime) {
+                lastGreetingTime = new Date(savedGreetingTime);
+            }
 
             const today = new Date();
             currentMonth = today.getMonth();
             currentYear = today.getFullYear();
-            transactionDateInput.value = today.toISOString().split('T')[0];
+            transactionDateInput.value = formatDateToYYYYMMDD(today);
             populateCategoryDropdown();
             showTab(document.querySelector('.tab-button.active')?.dataset.tab || 'overview');
+        }
+
+        // --- FIX 4.2: Month/Year Picker Logic ---
+        function openMonthYearPicker() {
+            monthYearModalTitle.textContent = 'Select Year';
+            monthYearSelectionGrid.innerHTML = '';
+
+            const yearsWithTransactions = [...new Set(transactions.map(t => parseDateString(t.date).getFullYear()))];
+            const currentY = new Date().getFullYear();
+            if (!yearsWithTransactions.includes(currentY)) {
+                yearsWithTransactions.push(currentY);
+            }
+            yearsWithTransactions.sort((a, b) => b - a); // Sort descending
+
+            yearsWithTransactions.forEach(year => {
+                const yearBtn = document.createElement('button');
+                yearBtn.className = 'btn';
+                yearBtn.textContent = year;
+                yearBtn.onclick = () => showMonthPicker(year);
+                monthYearSelectionGrid.appendChild(yearBtn);
+            });
+            monthYearModalOverlay.classList.add('active');
+        }
+
+        function showMonthPicker(year) {
+            selectedYearForPicker = year;
+            monthYearModalTitle.textContent = `Select Month for ${year}`;
+            monthYearSelectionGrid.innerHTML = '';
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            
+            months.forEach((month, index) => {
+                const monthBtn = document.createElement('button');
+                monthBtn.className = 'btn';
+                monthBtn.textContent = month;
+                monthBtn.onclick = () => {
+                    currentYear = selectedYearForPicker;
+                    currentMonth = index;
+                    updateOverviewDisplay();
+                    monthYearModalOverlay.classList.remove('active');
+                };
+                monthYearSelectionGrid.appendChild(monthBtn);
+            });
         }
 
         // --- Event Listeners ---
         tabButtons.forEach(button => button.addEventListener('click', () => showTab(button.dataset.tab)));
         prevMonthBtn.addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } updateOverviewDisplay(); });
         nextMonthBtn.addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } updateOverviewDisplay(); });
+        currentMonthDisplay.addEventListener('click', openMonthYearPicker); // FIX 4.2
+        closeMonthYearModalBtn.addEventListener('click', () => monthYearModalOverlay.classList.remove('active')); // FIX 4.2
         openAnalysisModalBtn.addEventListener('click', () => analysisModalOverlay.classList.add('active'));
         closeAnalysisModalBtn.addEventListener('click', () => analysisModalOverlay.classList.remove('active'));
         modalApplySingleDateBtn.addEventListener('click', () => { if (modalSingleDatePicker.value) filterAnalysisTransactions('day', parseDateString(modalSingleDatePicker.value)); });
@@ -2314,9 +2413,13 @@
         closeAddCategoryModalBtn.addEventListener('click', () => addCategoryModal.classList.remove('active'));
         confirmAddCategoryBtn.addEventListener('click', addCategory);
         userNameInput.addEventListener('change', updateLocalStorage);
+        
+        // FIX 3: Event listener for category dropdown reset
         categorySelect.addEventListener('change', (e) => {
             if (e.target.value) {
-                e.target.style.color = 'var(--text-color-dark)';
+                e.target.classList.remove('placeholder-shown');
+            } else {
+                e.target.classList.add('placeholder-shown');
             }
         });
 
