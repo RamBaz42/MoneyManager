@@ -67,11 +67,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Changed to flex-start */
             min-height: 100vh;
             color: var(--text-color-dark);
             line-height: 1.6;
-            padding: 20px;
+            padding: 0; /* Changed padding to 0 for body */
             overflow-x: hidden;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
@@ -81,11 +81,12 @@
             border-radius: var(--radius-large);
             box-shadow: var(--shadow-subtle);
             width: 480px;
-            max-width: 98%;
+            max-width: 100%; /* Changed from 98% */
             text-align: center;
             position: relative;
             overflow: hidden;
             transition: background-color 0.3s ease, box-shadow 0.3s ease-in-out;
+            margin: 20px 0; /* Add margin for spacing on larger screens */
         }
         .header-controls {
             display: flex;
@@ -107,16 +108,6 @@
             background-color: var(--bg-light-alt);
             color: var(--text-color-dark);
         }
-        
-        .title-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            width: 100%;
-            margin-bottom: 28px;
-        }
-
         .theme-switcher {
             display: flex;
             align-items: center;
@@ -124,9 +115,7 @@
             border-radius: 50px;
             padding: 5px;
             cursor: pointer;
-            position: absolute;
-            right: 0;
-            margin-left: 0; 
+            margin-left: 15px;
         }
         .theme-switcher-icon {
             width: 24px;
@@ -148,8 +137,8 @@
         h1 {
             font-weight: 700;
             color: var(--primary-blue);
-            margin-bottom: 0; 
-            font-size: 2.4em; 
+            margin-bottom: 28px;
+            font-size: 2.8em;
             letter-spacing: -0.8px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
             text-align: center;
@@ -243,18 +232,18 @@
             font-weight: 700;
             margin-top: 8px;
             text-shadow: 2px 3px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             padding: 0 10px;
             display: block;
-            /* RESPONSIVE FIX: Allow long numbers to break */
-            word-break: break-all;
         }
         .income-expense-summary {
             background-color: var(--bg-card);
             box-shadow: var(--shadow-subtle);
             padding: 20px; 
             display: flex;
-            /* RESPONSIVE FIX: Default to row, will change in media query */
-            flex-direction: row; 
+            flex-direction: row; /* Changed back to row for desktop */
             justify-content: space-around;
             margin: 30px 0;
             border-radius: var(--radius-large);
@@ -266,10 +255,9 @@
             padding: 10px 15px; 
             position: relative;
         }
-        /* RESPONSIVE FIX: Use border-right for separator on wider screens */
         .income-expense-summary > div:first-of-type {
-            border-bottom: none;
-            border-right: 1px solid var(--border-light);
+            border-bottom: none; /* Remove bottom border */
+            border-right: 1px solid var(--border-light); /* Add right border for desktop */
             margin-bottom: 0; 
             padding-bottom: 10px;
         }
@@ -288,11 +276,12 @@
             font-size: clamp(1.4em, 4vw, 1.8em);
             font-weight: 700;
             letter-spacing: 0.5px;
-            text-align: right;
+            white-space: nowrap;
+            text-align: center; /* Centered money */
             display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
             padding-left: 5px;
-            /* RESPONSIVE FIX: Allow long numbers to break */
-            word-break: break-all;
         }
         .money.plus {
             color: var(--soft-green);
@@ -415,7 +404,7 @@
         }
         
         input[type="text"], input[type="number"], input[type="date"], .select-wrapper {
-            border: none; 
+            border: none;
             background-color: transparent;
             flex-grow: 1;
             height: 51px;
@@ -665,9 +654,6 @@
             opacity: 0;
             transform: translateY(20px);
             animation: listItemFadeIn 0.5s ease-out forwards;
-            /* RESPONSIVE FIX: Allow items to wrap */
-            flex-wrap: wrap;
-            gap: 10px; /* Add gap for wrapped items */
         }
         @keyframes listItemFadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -688,24 +674,19 @@
             flex-direction: column;
             align-items: flex-start;
             flex-grow: 1;
-            /* RESPONSIVE FIX: Allow description to break */
-            word-break: break-all;
+            overflow: hidden; /* Prevent text overflow */
         }
         .transaction-description {
             font-weight: 600;
             font-size: 1.15em;
             margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .transaction-date {
             font-size: 0.88em;
             color: var(--text-color-medium);
-        }
-        .transaction-amount {
-            /* RESPONSIVE FIX: New class for amount to control spacing */
-            font-weight: 600;
-            font-size: 1.1em;
-            word-break: break-all;
-            text-align: right;
         }
         .category-tag {
             font-family: var(--font-main);
@@ -718,6 +699,7 @@
             margin-left: 18px;
             white-space: nowrap;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0; /* Prevent tag from shrinking */
         }
         [data-theme="dark"] .category-tag {
             background-color: var(--primary-accent);
@@ -1104,16 +1086,33 @@
             background: var(--text-color-medium);
         }
 
-        /* --- RESPONSIVE FIXES --- */
+        /*
+        ========================================
+        --- RESPONSIVE DESIGN MEDIA QUERIES ---
+        ========================================
+        */
+
+        /* For tablets and smaller desktops */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                padding: 25px;
+                min-height: 100vh;
+            }
+        }
+
+        /* For mobile phones (e.g., up to 600px) */
         @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
             .container {
                 padding: 25px 20px;
             }
             h1 {
-                font-size: 2.0em; /* Further reduce title size */
-            }
-            .title-container {
-                padding-right: 40px; /* Add padding to prevent overlap with theme switcher */
+                font-size: 2.2em;
             }
             #overview-balance-amount {
                 font-size: clamp(2em, 7vw, 2.8em);
@@ -1126,6 +1125,9 @@
                 gap: 15px;
                 padding: 15px;
             }
+            .income-expense-summary > div {
+                padding: 10px 0;
+            }
             .income-expense-summary > div:first-of-type {
                 border-right: none;
                 padding-bottom: 15px;
@@ -1133,30 +1135,23 @@
             }
             .list li {
                 padding: 12px 15px;
-                /* Justify content to start to allow wrapping */
-                justify-content: flex-start;
+                flex-wrap: wrap; /* Allow items to wrap */
+                gap: 10px;
             }
             .transaction-details {
-                /* Allow details to shrink to make space */
-                flex-basis: 100%;
-            }
-            .category-tag {
-                margin-left: 0;
-                margin-top: 5px;
-            }
-            .transaction-amount {
-                /* Take full width when wrapped */
-                flex-basis: 100%;
-                text-align: right;
-                margin-top: 5px;
+                flex-basis: 100%; /* Take full width on a new line */
+                order: 1; /* Ensure it comes first */
             }
             .list-item-buttons {
-                /* Take full width and justify to the end */
-                flex-basis: 100%;
-                justify-content: flex-end;
-                margin-left: 0;
-                margin-top: 10px;
+                order: 2;
             }
+            .category-tag {
+                order: 3;
+            }
+            .list li > span:not(.category-tag) { /* Target the amount span */
+                order: 4;
+            }
+
             .modal-content .modal-period-buttons {
                 grid-template-columns: 1fr;
             }
@@ -1169,18 +1164,26 @@
                 margin-bottom: 10px;
             }
         }
-        
-        /* RESPONSIVE FIX: For very small screens */
-        @media (max-width: 360px) {
+
+        /* For very small mobile phones (e.g., up to 400px) */
+        @media (max-width: 400px) {
             .container {
                 padding: 20px 15px;
+            }
+            h1 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+            h3 {
+                font-size: 1.2em;
             }
             .tab-button {
                 font-size: 0.9em;
                 padding: 12px 5px;
             }
-            .money {
-                font-size: clamp(1.1em, 3vw, 1.3em);
+            .btn {
+                padding: 14px 20px;
+                font-size: 1.1em;
             }
             .list li {
                 padding: 10px;
@@ -1188,11 +1191,22 @@
             .transaction-description {
                 font-size: 1.05em;
             }
+            .category-tag {
+                padding: 5px 10px;
+                font-size: 0.75em;
+            }
             .edit-btn, .delete-btn {
                 padding: 5px 8px;
-                font-size: 0.8em;
+            }
+            .month-display {
+                font-size: 1.1em;
+            }
+            .month-nav-btn {
+                width: 35px;
+                height: 35px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -1201,15 +1215,13 @@
             <div class="name-input-container">
                 <input type="text" id="user-name-input" placeholder="Enter your name here" maxlength="10">
             </div>
-        </div>
-
-        <div class="title-container">
-            <h1>ExpenseFlow</h1>
             <div class="theme-switcher" id="theme-switcher">
                 <svg id="theme-icon-sun" class="theme-switcher-icon active" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.64 5.64zm12.72 12.72c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zM5.64 18.36l-1.06-1.06c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0l1.06 1.06c.39.39.39 1.02 0 1.41s-1.02.39-1.41 0zm12.72-12.72l-1.06-1.06c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0l1.06 1.06c.39.39.39 1.02 0 1.41-.39.39-1.02.39-1.41 0z"/></svg>
                 <svg id="theme-icon-moon" class="theme-switcher-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07-1.27.21-2.48.62-3.62 1.22-3.73 2-5.14 6.45-3.6 9.9 1.73 3.9 6.22 5.39 9.9 3.6 3.31-1.6 4.93-5.52 4.19-8.93-.33.16-.66.3-1 .46-4.51 2.33-8.48.5-10.07-.53z"/></svg>
             </div>
         </div>
+
+        <h1>ExpenseFlow</h1>
 
         <div class="tabs">
             <button class="tab-button active" data-tab="overview">Overview</button>
@@ -1456,8 +1468,8 @@
         let activeVoiceBox = null;
         let voiceState = 'idle'; 
         let amountType = null; 
-        let lastGreetingTime = null; 
-        let selectedYearForPicker = null; 
+        let lastGreetingTime = null;
+        let selectedYearForPicker = null;
 
         // --- Web Speech API Setup ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1608,12 +1620,12 @@
                 const fiveMinutes = 5 * 60 * 1000;
                 if (!lastGreetingTime || (now - lastGreetingTime > fiveMinutes)) {
                     lastGreetingTime = now;
-                    updateLocalStorage(); 
+                    updateLocalStorage();
                     const userName = userNameInput.value.trim();
                     const greeting = userName ? `Hello ${userName}, my friend. Let's do the entries.` : "Let's do the entries.";
-                    speak(greeting, startMainFlow); 
+                    speak(greeting, startMainFlow);
                 } else {
-                    startMainFlow(); 
+                    startMainFlow();
                 }
 
             } else if (field === 'amount') {
@@ -1842,7 +1854,7 @@
                         const foundCategory = categories.find(cat => cat.toLowerCase() === lowerCaseText);
                         if (foundCategory) {
                             categorySelect.value = foundCategory;
-                            categorySelect.dispatchEvent(new Event('change')); 
+                            categorySelect.dispatchEvent(new Event('change'));
                             continueConversation('Category set. Is this an income or an expense?', amountInput.closest('.input-with-mic'), 'master_awaiting_amount_type');
                         } else {
                             speak(`'${text}' is not a category. Please add it with the plus button and start again.`, () => {
@@ -2013,14 +2025,13 @@
             const sign = transaction.amount < 0 ? 'minus' : 'plus';
             const item = document.createElement('li');
             item.classList.add(sign);
-            // RESPONSIVE FIX: Amount is now in its own span for better control
             item.innerHTML = `
                 <div class="transaction-details">
                     <span class="transaction-description">${transaction.text}</span>
                     <span class="transaction-date">${formatDateForDisplay(parseDateString(transaction.date))}</span>
                 </div>
                 <span class="category-tag">${transaction.category}</span>
-                <span class="transaction-amount">₹${formatIndianCurrency(transaction.amount)}</span>
+                <span>₹${formatIndianCurrency(transaction.amount)}</span>
                 <div class="list-item-buttons">
                     <button class="edit-btn" onclick="window.editTransaction(${transaction.id})">Edit</button>
                     <button class="delete-btn" onclick="window.confirmDeleteTransaction(${transaction.id})">x</button>
@@ -2412,7 +2423,7 @@
             if (!yearsWithTransactions.includes(currentY)) {
                 yearsWithTransactions.push(currentY);
             }
-            yearsWithTransactions.sort((a, b) => b - a); 
+            yearsWithTransactions.sort((a, b) => b - a);
 
             yearsWithTransactions.forEach(year => {
                 const yearBtn = document.createElement('button');
@@ -2448,8 +2459,8 @@
         tabButtons.forEach(button => button.addEventListener('click', () => showTab(button.dataset.tab)));
         prevMonthBtn.addEventListener('click', () => { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } updateOverviewDisplay(); });
         nextMonthBtn.addEventListener('click', () => { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } updateOverviewDisplay(); });
-        currentMonthDisplay.addEventListener('click', openMonthYearPicker); 
-        closeMonthYearModalBtn.addEventListener('click', () => monthYearModalOverlay.classList.remove('active')); 
+        currentMonthDisplay.addEventListener('click', openMonthYearPicker);
+        closeMonthYearModalBtn.addEventListener('click', () => monthYearModalOverlay.classList.remove('active'));
         openAnalysisModalBtn.addEventListener('click', () => analysisModalOverlay.classList.add('active'));
         closeAnalysisModalBtn.addEventListener('click', () => analysisModalOverlay.classList.remove('active'));
         modalApplySingleDateBtn.addEventListener('click', () => { if (modalSingleDatePicker.value) filterAnalysisTransactions('day', parseDateString(modalSingleDatePicker.value)); });
